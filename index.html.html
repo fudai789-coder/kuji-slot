@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>スロットくじ</title>
+
+<style>
+body{
+  font-family:-apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  text-align:center;
+  background:linear-gradient(135deg,#5f72be,#9b23ea);
+  color:white;
+  margin:0;
+  padding:30px 10px;
+}
+
+h1{
+  font-size:28px;
+  margin-bottom:30px;
+}
+
+/* 2グループ横並び */
+.wrapper{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:40px;
+  max-width:1100px;
+  margin:auto;
+}
+
+/* 左グループ（クール系） */
+.columnA{
+  padding:25px;
+  border-radius:30px;
+  background:linear-gradient(180deg,#dfe9f3,#ffffff);
+}
+
+/* 右グループ（ウォーム系） */
+.columnB{
+  padding:25px;
+  border-radius:30px;
+  background:linear-gradient(180deg,#fff1eb,#ffffff);
+}
+
+.slot{
+  height:120px;
+  border-radius:20px;
+  box-shadow:0 15px 25px rgba(0,0,0,0.2);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  font-weight:bold;
+  margin-bottom:20px;
+  transition:0.3s;
+}
+
+/* グループごとのカード色 */
+.columnA .slot{
+  background:#e3f2fd;
+  color:#0d47a1;
+}
+
+.columnB .slot{
+  background:#ffe0b2;
+  color:#bf360c;
+}
+
+.name{
+  font-size:20px;
+  margin-bottom:8px;
+}
+
+.prize{
+  font-size:24px;
+}
+
+button{
+  margin-top:40px;
+  padding:18px 40px;
+  font-size:22px;
+  border:none;
+  border-radius:40px;
+  background:#ff7675;
+  color:white;
+  cursor:pointer;
+  width:300px;
+  max-width:80%;
+}
+
+button:active{
+  transform:scale(0.95);
+}
+
+/* 縦向きiPad対応 */
+@media (max-width: 900px){
+  .wrapper{
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<h1>🎰 ドキドキくじ 🎰</h1>
+
+<div class="wrapper">
+  <div class="columnA" id="groupA"></div>
+  <div class="columnB" id="groupB"></div>
+</div>
+
+<button onclick="startLottery()">スタート！</button>
+
+<script>
+const groupA = ["ひなた","りくと","たいが","ゆうき"];
+const groupB = ["あんじ","あやか","しおり","なおと"];
+
+const prizes = ["慰霊の日","慰霊碑","戦跡","資料館"];
+
+function shuffle(array){
+  for(let i=array.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [array[i],array[j]]=[array[j],array[i]];
+  }
+  return array;
+}
+
+function createSlots(groupId, names){
+  const container=document.getElementById(groupId);
+  container.innerHTML="";
+  names.forEach(name=>{
+    const div=document.createElement("div");
+    div.className="slot";
+    div.innerHTML=`
+      <div class="name">${name}</div>
+      <div class="prize">---</div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function startGroup(groupId){
+  const shuffled=shuffle([...prizes]);
+  const slots=document.querySelectorAll(`#${groupId} .slot`);
+
+  slots.forEach((slot,index)=>{
+    const prizeDiv=slot.querySelector(".prize");
+
+    let interval=setInterval(()=>{
+      const randomPrize=prizes[Math.floor(Math.random()*prizes.length)];
+      prizeDiv.textContent=randomPrize;
+    },70);
+
+    setTimeout(()=>{
+      clearInterval(interval);
+      prizeDiv.textContent=shuffled[index];
+
+      slot.animate([
+        { transform:"scale(1)" },
+        { transform:"scale(1.1)" },
+        { transform:"scale(1)" }
+      ],{ duration:300 });
+
+    },2000 + index*600);
+
+  });
+}
+
+function startLottery(){
+  startGroup("groupA");
+  startGroup("groupB");
+}
+
+createSlots("groupA", groupA);
+createSlots("groupB", groupB);
+</script>
+
+</body>
+</html>
